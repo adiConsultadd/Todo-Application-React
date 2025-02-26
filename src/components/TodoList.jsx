@@ -1,8 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export default function TodoList() {
-    //Stores all the tasks
-    const [tasks, setTasks] = useState([]) //{text:String, completed:Boolean}
+    //Stores all the tasks - now retrieving from localStorage on initial load
+    const [tasks, setTasks] = useState(() => {
+        // Get stored tasks from localStorage or default to empty array
+        const savedTasks = localStorage.getItem('tasks')
+        return savedTasks ? JSON.parse(savedTasks) : []
+    })
 
     //Stores the new task that is about to be added
     const [newTask, setNewTask] = useState("")
@@ -12,6 +16,11 @@ export default function TodoList() {
 
     //Stores the already present text of the task about to be edited
     const [editText, setEditText] = useState("")
+
+    // Save tasks to localStorage whenever tasks state changes
+    useEffect(() => {
+        localStorage.setItem('tasks', JSON.stringify(tasks))
+    }, [tasks])
 
     function handleInputChange(e) {
         setNewTask(e.target.value)
@@ -47,10 +56,9 @@ export default function TodoList() {
             updatedTasks[editIndex].text = editText
             setTasks(updatedTasks)
             setEditIndex(null)
-            setEditText(null)
+            setEditText("")
         }
     }
-
 
     function cancelEdit() {
         setEditIndex(null)
